@@ -1,0 +1,57 @@
+service: userservice
+
+frameworkVersion: '2'
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  lambdaHashingVersion: 20201221
+  stage: dev
+  region: us-east-1
+
+custom:
+  tableName: usersTable
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+    migration:
+      dir: offline/migrations
+
+functions:
+  populateUsers:
+    handler: lambdas/endpoints/populateUsers.handler
+    # memorySize: 128
+    description: Populate Users DynamoDB table with dummy user contact cards.
+    events:
+      - httpApi:
+          path: /users
+          method: POST
+
+resources:
+  Resources:
+    MyDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableName}
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+          - AttributeName: fullName
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+          - AttributeName: fullName
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        BillingMode: PAY_PER_REQUEST
