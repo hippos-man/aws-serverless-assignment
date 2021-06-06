@@ -12,6 +12,8 @@ provider:
   lambdaHashingVersion: 20201221
   stage: dev
   region: us-east-1
+  environment:
+    tableName: ${self:custom.tableName}
 
 custom:
   tableName: usersTable
