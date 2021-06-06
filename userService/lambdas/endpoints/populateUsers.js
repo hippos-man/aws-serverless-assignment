@@ -31,60 +31,28 @@ module.exports.handler = async (event) => {
   // }
 
   // TODO: Generate fake user objects
-  const fakeUsers = [
-    {
-      PutRequest: {
-        Item: {
-          "email": "john@gmail.com",
-          "fullName": "John Doe",
-          "phoneNumber": "89003388"
-        }
-      }
-    },
-    {
-      PutRequest: {
-        Item: {
-          "email": "sho@gmail.com",
-          "fullName": "Sho Tanaka",
-          "phoneNumber": "55008800"
-        }
-      }
-    },
-    {
-      PutRequest: {
-        Item: {
-          "email": "kelly@gmail.com",
-          "fullName": "Kelly Slater",
-          "phoneNumber": "55098800"
-        }
-      }
-    },
-    {
-      PutRequest: {
-        Item: {
-          "email": "sally@gmail.com",
-          "fullName": "Sally Doe",
-          "phoneNumber": "55708800"
-        }
-      }
-    },
- ]
-  // const fakeUsers = await UserUtils.populate(1200);
+  const fakeUsers = await UserUtils.populate(1200);
 
-  // TODO: Put data into DynamoDB
-  const isSuccessful = await Dynamo.bulkWrite(fakeUsers, tableName)
-    .catch(err => {
-      console.log('Error in dynamo write', err);
-      return null;
-  });
-
-  // Return result
-  if(!isSuccessful) {
+  if(!fakeUsers) {
     return Responses._400(
       { 
-        message: 'Unable to populate users.'
+        message: 'Unable to generate fake user cards.'
       }
     );
+  }
+
+  // Put data into DynamoDB
+  for (var i = 0; i < fakeUsers.length; i++) {
+    const isSuccessful = await Dynamo.batchWrite(fakeUsers[i], tableName)
+      .catch(err => {
+        console.log('Error in dynamo write', err);
+        return null;
+    });
+
+    // Return result
+    if(!isSuccessful) {
+      console.log('Error occurred in batch process.')
+    }
   }
 
   return Responses._200({message: 'Successfully users populated.'});

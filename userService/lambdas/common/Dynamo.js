@@ -7,8 +7,6 @@ AWS.config.update({
   endpoint: "http://localhost:8000"
 });
 
-// AWS.config.setPromisesDependency(require('bluebird'));
-
 let options = {};
 
 if (process.env.IS_OFFLINE) {
@@ -34,24 +32,19 @@ const Dynamo = {
         
     },
 
-    // TODO: Write (multiple items)
-    async bulkWrite(data, tableName) {
-
+    async batchWrite(data, tableName) {
       const params = {
         RequestItems: {
-          [tableName]: data
+          [tableName]: data.requestGroup
         }
       };
 
       const response = await dynamoDb.batchWrite(params).promise();
 
-        if (!response) {
-            throw Error('There is an error in batch writing.');
-        }
-
-        return data;
-
-
+      if(!response) {
+        throw Error('There is an error in batch operation.');
+      }
+      return true;
     },
 
     // TODO: Query
