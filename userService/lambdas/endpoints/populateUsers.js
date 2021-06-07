@@ -7,30 +7,21 @@ const UserUtils = require('../common/UserUtils');
 const tableName = process.env.tableName;
 
 module.exports.handler = async (event) => {
-  // TODO: Database Init
-  // const isTableEmpty = await Dynamo.initialCheck(tableName)
-  //   .catch(err => {
-  //     console.log('Error in checking table.', err);
-  //     return null;
-  // });
 
-  // if (!isTableEmpty) {
-  //   // TODO: Remove all
-  //   const isCleanedUp = await Dynamo.cleanUp(tableName).catch(err => {
-  //     console.log('Error in cleaning up table.', err);
-  //     return null
-  //   });
+  const isInitialized = await Dynamo.init(tableName)
+    .catch(err => {
+      console.log('Error in cleaning up the table.', err);
+      return false;
+  });
 
-  //   if(!isCleanedUp) {
-  //     return Responses._400(
-  //       {
-  //         message: 'Unable to remove data in the table.'
-  //       }
-  //     );
-  //   }
+  if(!isInitialized) {
+    return Responses._400(
+      {
+        message: 'Unable to initialize the table.'
+      }
+    );
+  }
     
-  // }
-
   // Generate fake user objects
   const fakeUsers = await UserUtils.generateFakeUsers(1200);
 
