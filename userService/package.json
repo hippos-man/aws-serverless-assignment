@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "faker": "^5.5.3",
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^7.0.0"
   }

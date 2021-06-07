@@ -1,23 +1,23 @@
 'use strict';
 
-const uuid = require('uuid');
+const faker = require('faker');
 
 const UserUtils = {
 
-    async populate(limit) {
+    async generateFakeUsers(limit) {
         // Divide requests into small groups(25 req per group).
         let batchList = []
         let data = []
 
-        // TODO: Use third party to generate fake data
         for (var i = 0; i < limit; i++) {
+
             let newItem =
             {
                 PutRequest: {
                   Item: {
-                    "email": uuid.v1() + "@gmail.com",
-                    "fullName": "John Doe",
-                    "phoneNumber": "89003388"
+                    "email": faker.internet.email(),
+                    "fullName": faker.name.findName(),
+                    "phoneNumber": faker.phone.phoneNumber()
                   }
                 }
             }

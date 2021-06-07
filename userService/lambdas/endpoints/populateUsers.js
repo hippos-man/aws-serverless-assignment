@@ -3,6 +3,7 @@
 const Dynamo = require('../common/Dynamo');
 const Responses = require('../common/Responses');
 const UserUtils = require('../common/UserUtils');
+
 const tableName = process.env.tableName;
 
 module.exports.handler = async (event) => {
@@ -30,8 +31,8 @@ module.exports.handler = async (event) => {
     
   // }
 
-  // TODO: Generate fake user objects
-  const fakeUsers = await UserUtils.populate(1200);
+  // Generate fake user objects
+  const fakeUsers = await UserUtils.generateFakeUsers(1200);
 
   if(!fakeUsers) {
     return Responses._400(
