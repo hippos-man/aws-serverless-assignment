@@ -1,41 +1,44 @@
 'use strict';
 
-const Dynamo = require('../common/Dynamo');
+const DynamoClient = require('../common/DynamoClient');
 const Responses = require('../common/Responses');
+const DynamoDb = require('../common/DynamoDb');
 const UserUtils = require('../common/UserUtils');
 
 const tableName = process.env.tableName;
 
 module.exports.handler = async (event) => {
 
-  const isInitialized = await Dynamo.init(tableName)
-    .catch(err => {
-      console.log('Error in cleaning up the table.', err);
-      return false;
+  console.log('Started initializing users table.');
+  // Refresh Users table
+  const isCleanedUp = await DynamoDb.refresh(tableName).catch(err => {
+    console.log('Error in dynamodb operation.', err);
+    return null;
   });
 
-  if(!isInitialized) {
-    return Responses._400(
-      {
-        message: 'Unable to initialize the table.'
+  if(!isCleanedUp) {
+    return Responses._500(
+      { 
+        message: 'Unexpected error occurred in initializing table.'
       }
     );
   }
-    
+
   // Generate fake user objects
   const fakeUsers = await UserUtils.generateFakeUsers(1200);
 
   if(!fakeUsers) {
-    return Responses._400(
+    return Responses._500(
       { 
-        message: 'Unable to generate fake user cards.'
+        message: 'Unexpected error occurred in generating fake user cards.'
       }
     );
   }
 
+  console.log('Populating test users...');
   // Put data into DynamoDB
   for (var i = 0; i < fakeUsers.length; i++) {
-    const isSuccessful = await Dynamo.batchWrite(fakeUsers[i], tableName)
+    const isSuccessful = await DynamoClient.batchWrite(fakeUsers[i], tableName)
       .catch(err => {
         console.log('Error in dynamo write', err);
         return null;
@@ -43,10 +46,15 @@ module.exports.handler = async (event) => {
 
     // Return result
     if(!isSuccessful) {
-      console.log('Error occurred in batch process.')
+      console.log('Error occurred in batch process.');
+      return Responses._500(
+        { 
+          message: 'Unexpected error occurred in generating fake user cards.'
+        }
+      );
     }
   }
-
+  console.log('Populate users Done!')
   return Responses._200({message: 'Successfully users populated.'});
 
 };

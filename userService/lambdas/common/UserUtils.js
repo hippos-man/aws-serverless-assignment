@@ -35,7 +35,7 @@ const UserUtils = {
 
         return batchList;
     },
-
+    
 };
 
 module.exports = UserUtils;

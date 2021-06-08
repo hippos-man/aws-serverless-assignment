@@ -20,28 +20,7 @@ if (process.env.IS_OFFLINE) {
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient(options);
 
-const Dynamo = {
-
-    async init(TableName) {
-      // Check if the table has any data generated before.
-      const params = {
-        TableName: TableName,
-        ProjectionExpression: "email"
-      };
-
-      const data = await dynamoDb.scan(params).promise();
-      if(!data || !data.Items) {
-          throw Error('There is an error scanning the data.');
-      }
-      // If table is not empty, remove all data.
-      if(data.Count > 0) {
-        // TODO: Clean up the table
-
-      }
-      
-      return true;
-
-    },
+const DynamoClient = {
 
     async batchWrite(data, tableName) {
       const params = {
@@ -62,4 +41,4 @@ const Dynamo = {
 
 };
 
-module.exports = Dynamo;
+module.exports = DynamoClient;
