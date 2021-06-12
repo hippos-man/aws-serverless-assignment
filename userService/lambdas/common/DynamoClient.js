@@ -44,7 +44,6 @@ const DynamoClient = {
       if(!data || !data.Items) {
         throw Error('There is an error in query execution.');
       }
-      console.log(data);
       return data.Items;
     },
 

@@ -18,7 +18,7 @@ module.exports.handler = async (event) => {
         return Responses._400(
             {   
                 status: 400,
-                message: 'Invalid request parameters found.'
+                message: 'Bad request with invalid request parameters.'
             }
         );
     }

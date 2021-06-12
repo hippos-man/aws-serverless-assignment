@@ -1,10 +1,13 @@
 {
   "name": "userService",
   "version": "1.0.0",
-  "description": "",
+  "description": "AWS assessment",
   "main": "index.js",
   "scripts": {
-    "start": "serverless offline start"
+    "start": "sls offline start",
+    "populate-users": "sls invoke local --function populateUsers",
+    "query-user-by-userid": "sls invoke local --function queryUsers --path test/userIdParam.json",
+    "query-users-by-department-and-username": "sls invoke local --function queryUsers --path test/departmentAndUsernameParams.json"
   },
   "keywords": [],
   "author": "",

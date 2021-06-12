@@ -1,0 +1,6 @@
+{
+    "queryStringParameters": {
+        "department_name": "marketing",
+        "user_name": "A"
+    }
+}
