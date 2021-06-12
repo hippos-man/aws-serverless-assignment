@@ -55,12 +55,12 @@ const DynamoClient = {
         throw Error('There is an error in query execution.');
       }
       console.log(data);
-      return true;
+      return data.Items;
     },
 
     // TODO: Query by department name & user name
     async queryByDepartmentNameAndUserName(departmentName, userName) {
-    
+      
     },
 
     // Test purpose only

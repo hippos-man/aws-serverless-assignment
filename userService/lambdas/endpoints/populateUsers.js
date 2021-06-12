@@ -18,7 +18,8 @@ module.exports.handler = async (event) => {
 
   if(!isCleanedUp) {
     return Responses._500(
-      { 
+      {  
+        status: 500,
         message: 'Unexpected error occurred in initializing table.'
       }
     );
@@ -32,6 +33,7 @@ module.exports.handler = async (event) => {
   if(!fakeUsers) {
     return Responses._500(
       { 
+        status: 500,
         message: 'Unexpected error occurred in generating fake user cards.'
       }
     );
@@ -51,6 +53,7 @@ module.exports.handler = async (event) => {
       console.log('Error occurred in batch process.');
       return Responses._500(
         { 
+          status: 500,
           message: 'Unexpected error occurred in generating fake user cards.'
         }
       );
@@ -58,6 +61,10 @@ module.exports.handler = async (event) => {
   }
 
   console.log('Populate users Done!');
-  return Responses._200({message: 'Successfully users populated.'});
+  return Responses._200(
+  { 
+    status: 200,
+    message: 'success'
+  });
 
 };

@@ -9,6 +9,8 @@ module.exports.handler = async (event) => {
 
     const queryString = event.queryStringParameters;
     const userIdString = queryString.user_id || '';
+    const departmentName = queryString.departmentName || '';
+    const userName = queryString.userName || '';
     
     console.log('Querying for user ID = ', userIdString);
 
@@ -18,7 +20,8 @@ module.exports.handler = async (event) => {
         userId = parseInt(userIdString);
     } catch (err) {
         return Responses._400(
-            {
+            {   
+                status: 400,
                 message: 'Invalid request parameters.'
             }
         )
@@ -32,12 +35,18 @@ module.exports.handler = async (event) => {
 
     if(!data) {
         return Responses._500(
-            { 
+            {   
+                status: 500,
                 message: 'Unexpected error occurred in executing query.'
             }
         );
     }
 
-    return Responses._200(data);
+    return Responses._200(
+        {
+            status: 200,
+            data: data
+        }
+    );
 }
 
