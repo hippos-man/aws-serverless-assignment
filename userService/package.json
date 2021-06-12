@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "sls offline start"
+    "start": "serverless offline start"
   },
   "keywords": [],
   "author": "",

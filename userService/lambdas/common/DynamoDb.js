@@ -16,37 +16,41 @@ const DynamoDb = {
             TableName: TableName
         };
 
-        try {
+        const tableInfo = await fetchTableInfo(params);
 
-            const tableInfo = await fetchTableInfo(params);
-
-            if(tableInfo && tableInfo.Table.ItemCount == 0) {
-                return true;
-            }
-
-            console.log('Cleaning up existing data from the table...');
-
-            await dropTable(params);
-
-            await waitForDropped(params);
-
-            const createTableParams = {
-                AttributeDefinitions: tableInfo.Table.AttributeDefinitions,
-                KeySchema: tableInfo.Table.KeySchema,
-                ProvisionedThroughput: {
-                    ReadCapacityUnits: tableInfo.Table.ProvisionedThroughput.ReadCapacityUnits,
-                    WriteCapacityUnits: tableInfo.Table.ProvisionedThroughput.WriteCapacityUnits
-                },
-                TableName: tableInfo.Table.TableName
-            };
-
-            await createTable(createTableParams);
-
-        } catch(err) {
-            throw Error('There is an error in table operation.');
+        if(tableInfo && tableInfo.Table.ItemCount == 0) {
+            return true;
         }
 
-        console.log('Table Cleaning Done!');
+        console.log('Cleaning up existing data from the table...');
+
+        await dropTable(params);
+
+        await waitForDropped(params);
+
+        const createTableParams = {
+            AttributeDefinitions: tableInfo.Table.AttributeDefinitions,
+            KeySchema: tableInfo.Table.KeySchema,
+            ProvisionedThroughput: {
+                ReadCapacityUnits: tableInfo.Table.ProvisionedThroughput.ReadCapacityUnits,
+                WriteCapacityUnits: tableInfo.Table.ProvisionedThroughput.WriteCapacityUnits
+            },
+            GlobalSecondaryIndexes: [{
+                "IndexName": tableInfo.Table.GlobalSecondaryIndexes[0].IndexName,
+                "KeySchema": tableInfo.Table.GlobalSecondaryIndexes[0].KeySchema,
+                "Projection": tableInfo.Table.GlobalSecondaryIndexes[0].Projection,
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": tableInfo.Table.GlobalSecondaryIndexes[0].ProvisionedThroughput.ReadCapacityUnits,
+                    "WriteCapacityUnits": tableInfo.Table.GlobalSecondaryIndexes[0].ProvisionedThroughput.WriteCapacityUnits
+                }
+            }],
+            TableName: tableInfo.Table.TableName
+        };
+
+        await createTable(createTableParams);
+
+        await waitForCreated(params);
+
         return true;
 
     },
@@ -56,33 +60,26 @@ const DynamoDb = {
 
 const fetchTableInfo = (params) => {
     const response = Dynamo.describeTable(params).promise();
-    if(!response) {
-        throw Error('Error occurred in fetching existing table info.');
-    }
     return response;
 };
 
 const dropTable = (params) => {
     const response = Dynamo.deleteTable(params).promise();
-    if(!response) {
-        throw Error('Error occurred in dropping table.');
-    }
     return response;
 };
 
 const waitForDropped = (params) => {
     const response = Dynamo.waitFor('tableNotExists', params).promise();
-    if(!response) {
-        throw Error('Error occurred in dropping table.');
-    }
+    return response;
+};
+
+const waitForCreated = (params) => {
+    const response = Dynamo.waitFor('tableExists', params).promise();
     return response;
 };
 
 const createTable = (params) => {
     const response = Dynamo.createTable(params).promise();
-    if(!response) {
-        throw Error("Error occurred in creating table.")
-    }
     return response;
 };
 

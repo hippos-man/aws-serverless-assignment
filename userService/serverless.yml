@@ -24,18 +24,38 @@ custom:
       port: 8000
       inMemory: true
       migrate: true
-    migration:
-      dir: offline/migrations
+    # migration:
+    #   dir: offline/migrations
 
 functions:
   populateUsers:
     handler: lambdas/endpoints/populateUsers.handler
-    # memorySize: 128
     description: Populate Users DynamoDB table with dummy user contact cards.
     events:
       - httpApi:
           path: /users
           method: POST
+
+  queryUsers:
+    handler: lambdas/endpoints/getUsers.handler
+    description: Query user cards with filtering conditions.
+    events:
+      - httpApi:
+          path: /users
+          method: GET
+          request:
+            parameters:
+              querystrings:
+                email: true
+  # TEST ONLY
+  scanUsers:
+    handler: lambdas/endpoints/scanUsers.handler
+    description: Scan users table for test purpose.
+    events:
+      - httpApi:
+          path: /user-list
+          method: GET
+    
 
 resources:
   Resources:
@@ -44,16 +64,28 @@ resources:
       Properties:
         TableName: ${self:custom.tableName}
         AttributeDefinitions:
-          - AttributeName: email
+          - AttributeName: userId
+            AttributeType: N
+          - AttributeName: departmentName
             AttributeType: S
           - AttributeName: fullName
             AttributeType: S
         KeySchema:
-          - AttributeName: email
+          - AttributeName: userId
             KeyType: HASH
-          - AttributeName: fullName
-            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: departmentIndex
+            KeySchema:
+              - AttributeName: departmentName
+                KeyType: HASH
+              - AttributeName: fullName
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         BillingMode: PAY_PER_REQUEST

@@ -3,25 +3,34 @@
         "TableName": "usersTable",
         "KeySchema": [
             {
-                "AttributeName": "email",
+                "AttributeName": "userId",
                 "KeyType": "HASH"
-            },
-            {
-                "AttributeName": "fullName",
-                "KeyType": "RANGE"
             }
-
         ],
         "AttributeDefinitions": [
             {
-                "AttributeName": "email",
-                "AttributeType": "S"
-            },
-            {
-                "AttributeName": "fullName",
-                "AttributeType": "S"
+                "AttributeName": "userId",
+                "AttributeType": "N"
             }
         ],
+        "GlobalSecondaryIndexes": [{
+            "IndexName": "departmentIndex",
+            "KeySchema": [{
+                "AttributeName": "departmentName",
+                "KeyType": "HASH"
+			}, {
+                "AttributeName": "fullName",
+                "KeyType": "RANGE"
+			}],
+            "Projection": {
+                "NonKeyAttributes": ["userId", "email"],
+                "ProjectionType": "INCLUDE"
+            },
+            "ProvisionedThroughput": {
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
+            }
+		}],
         "ProvisionedThoughput": {
             "ReadCapacityUnits": 1,
             "WriteCapacityUnits": 1

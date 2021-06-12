@@ -34,10 +34,48 @@ const DynamoClient = {
       if(!response) {
         throw Error('There is an error in batch operation.');
       }
+      return response;
+    },
+
+    async queryByUserId(userId, tableName) {
+      const params = {
+        TableName: tableName,
+        KeyConditionExpression: "#id = :number",
+        ExpressionAttributeNames: {
+          "#id": "userId"
+        },
+        ExpressionAttributeValues: {
+          ":number": userId
+        }
+      }
+
+      const data = await dynamoDb.query(params).promise();
+
+      if(!data || !data.Items) {
+        throw Error('There is an error in query execution.');
+      }
+      console.log(data);
       return true;
     },
 
-    // TODO: Query
+    // TODO: Query by department name & user name
+    async queryByDepartmentNameAndUserName(departmentName, userName) {
+    
+    },
+
+    // Test purpose only
+    async scan(TableName) {
+      const params = {
+          TableName: TableName,
+          ProjectionExpression: "userId, fullName, email, departmentName"
+      };
+      const data = await dynamoDb.scan(params).promise();
+      if(!data || !data.Items) {
+          throw Error('There is an error scanning the data.');
+      }
+      
+      return data;
+  },
 
 };
 

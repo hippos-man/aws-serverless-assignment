@@ -12,7 +12,7 @@ module.exports.handler = async (event) => {
   console.log('Started initializing users table.');
   // Refresh Users table
   const isCleanedUp = await DynamoDb.refresh(tableName).catch(err => {
-    console.log('Error in dynamodb operation.', err);
+    console.log('Failed to clean up the users table.', err);
     return null;
   });
 
@@ -23,6 +23,8 @@ module.exports.handler = async (event) => {
       }
     );
   }
+  
+  console.log('Users table cleaning Done!');
 
   // Generate fake user objects
   const fakeUsers = await UserUtils.generateFakeUsers(1200);
@@ -41,7 +43,7 @@ module.exports.handler = async (event) => {
     const isSuccessful = await DynamoClient.batchWrite(fakeUsers[i], tableName)
       .catch(err => {
         console.log('Error in dynamo write', err);
-        return null;
+        return false;
     });
 
     // Return result
@@ -54,7 +56,8 @@ module.exports.handler = async (event) => {
       );
     }
   }
-  console.log('Populate users Done!')
+
+  console.log('Populate users Done!');
   return Responses._200({message: 'Successfully users populated.'});
 
 };
