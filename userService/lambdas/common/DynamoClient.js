@@ -48,20 +48,6 @@ const DynamoClient = {
       return data.Items;
     },
 
-    // Test purpose only
-    async scan(TableName) {
-      const params = {
-          TableName: TableName,
-          ProjectionExpression: "userId, fullName, email, departmentName"
-      };
-      const data = await dynamoDb.scan(params).promise();
-      if(!data || !data.Items) {
-          throw Error('There is an error scanning the data.');
-      }
-      
-      return data;
-  },
-
 };
 
 module.exports = DynamoClient;

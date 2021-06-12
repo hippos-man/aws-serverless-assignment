@@ -9,7 +9,7 @@ const tableName = process.env.tableName;
 module.exports.handler = async (event) => {
 
     const queryString = event.queryStringParameters;
-    const queryParams = await QueryUtils.generateParams(tableName, queryString).catch(err => {
+    const queryParams = await QueryUtils.buildParams(tableName, queryString).catch(err => {
         console.log('Error occurred in processing query parameters.', err);
         return null;
     });
