@@ -24,8 +24,6 @@ custom:
       port: 8000
       inMemory: true
       migrate: true
-    # migration:
-    #   dir: offline/migrations
 
 functions:
   populateUsers:
@@ -46,16 +44,9 @@ functions:
           request:
             parameters:
               querystrings:
-                email: true
-  # TEST ONLY
-  scanUsers:
-    handler: lambdas/endpoints/scanUsers.handler
-    description: Scan users table for test purpose.
-    events:
-      - httpApi:
-          path: /user-list
-          method: GET
-    
+                user_id: false
+                department_name: false
+                user_name: false
 
 resources:
   Resources:
