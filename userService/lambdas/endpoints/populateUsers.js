@@ -40,7 +40,6 @@ module.exports.handler = async (event) => {
   }
 
   console.log('Populating test users...');
-  // Put data into DynamoDB
   for (var i = 0; i < fakeUsers.length; i++) {
     const isSuccessful = await DynamoClient.batchWrite(fakeUsers[i], tableName)
       .catch(err => {
@@ -48,7 +47,6 @@ module.exports.handler = async (event) => {
         return false;
     });
 
-    // Return result
     if(!isSuccessful) {
       console.log('Error occurred in batch process.');
       return Responses._500(

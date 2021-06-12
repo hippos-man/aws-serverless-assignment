@@ -37,17 +37,7 @@ const DynamoClient = {
       return response;
     },
 
-    async queryByUserId(userId, tableName) {
-      const params = {
-        TableName: tableName,
-        KeyConditionExpression: "#id = :number",
-        ExpressionAttributeNames: {
-          "#id": "userId"
-        },
-        ExpressionAttributeValues: {
-          ":number": userId
-        }
-      }
+    async query(params) {
 
       const data = await dynamoDb.query(params).promise();
 
@@ -56,11 +46,6 @@ const DynamoClient = {
       }
       console.log(data);
       return data.Items;
-    },
-
-    // TODO: Query by department name & user name
-    async queryByDepartmentNameAndUserName(departmentName, userName) {
-      
     },
 
     // Test purpose only

@@ -2,33 +2,28 @@
 
 const DynamoClient = require('../common/DynamoClient');
 const Responses = require('../common/Responses');
+const QueryUtils = require('../common/QueryUtils');
 
 const tableName = process.env.tableName;
 
 module.exports.handler = async (event) => {
 
     const queryString = event.queryStringParameters;
-    const userIdString = queryString.user_id || '';
-    const departmentName = queryString.departmentName || '';
-    const userName = queryString.userName || '';
-    
-    console.log('Querying for user ID = ', userIdString);
+    const queryParams = await QueryUtils.generateParams(tableName, queryString).catch(err => {
+        console.log('Error occurred in processing query parameters.', err);
+        return null;
+    });
 
-    let userId;
-
-    try {
-        userId = parseInt(userIdString);
-    } catch (err) {
+    if(!queryParams) {
         return Responses._400(
             {   
                 status: 400,
-                message: 'Invalid request parameters.'
+                message: 'Invalid request parameters found.'
             }
-        )
+        );
     }
 
-    // Execute query
-    const data = await DynamoClient.queryByUserId(userId, tableName).catch(err => {
+    const data = await DynamoClient.query(queryParams, tableName).catch(err => {
         console.log('Error occurred in query operation.', err);
         return null;
     });
@@ -49,4 +44,3 @@ module.exports.handler = async (event) => {
         }
     );
 }
-
